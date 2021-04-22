@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "independent_gizmo",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Independent Gizmo",
+  "description": "Decouples the debug gizmo from the debug screen, and map its toggle to a different key. Also shows the attack indicator when the gizmo is active",
   "authors": [
-    "Me!"
+    "Minenash"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "sources": "https://github.com/Minenash/Independent-Gizmo",
+    "issues": "https://github.com/Minenash/Independent-Gizmo/issues"
   },
 
-  "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "license": "MIT",
+  "icon": "assets/independent_gizmo/icon.png",
 
   "environment": "*",
   "entrypoints": {
-    "main": [
-      "net.fabricmc.example.ExampleMod"
+    "client": [
+      "com.minenash.independent_gizmo.IndependentGizmo"
     ]
   },
   "mixins": [
@@ -30,8 +30,5 @@
     "fabricloader": ">=0.7.4",
     "fabric": "*",
     "minecraft": "1.16.x"
-  },
-  "suggests": {
-    "another-mod": "*"
   }
 }
