@@ -3,8 +3,8 @@ package com.minenash.independent_gizmo.mixin;
 import com.minenash.independent_gizmo.IndependentGizmo;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.options.AttackIndicator;
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.option.AttackIndicator;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.util.math.MatrixStack;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +21,7 @@ public abstract class InGameHudMixin {
 
 	boolean renderAttackIndicator = false;
 
-	@Inject(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;pushMatrix()V"))
+	@Inject(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;push()V"))
 	private void renderAttackIndicatorForDebugScreen(MatrixStack stack, CallbackInfo _info) {
 		if (MinecraftClient.getInstance().options.attackIndicator == AttackIndicator.CROSSHAIR) {
 			renderAttackIndicator = true;
@@ -30,7 +30,7 @@ public abstract class InGameHudMixin {
 		}
 	}
 
-	@Redirect(method = "renderCrosshair", at = @At(value = "FIELD", target = "Lnet/minecraft/client/options/GameOptions;debugEnabled:Z", opcode = Opcodes.GETFIELD))
+	@Redirect(method = "renderCrosshair", at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;debugEnabled:Z", opcode = Opcodes.GETFIELD))
 	private boolean getDebugCrosshairEnable(GameOptions options) {
 		return !renderAttackIndicator && IndependentGizmo.debugCrosshairEnable;
 	}
