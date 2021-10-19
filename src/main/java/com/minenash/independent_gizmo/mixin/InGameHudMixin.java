@@ -1,6 +1,7 @@
 package com.minenash.independent_gizmo.mixin;
 
 import com.minenash.independent_gizmo.IndependentGizmo;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.option.AttackIndicator;
@@ -21,8 +22,8 @@ public abstract class InGameHudMixin {
 
 	boolean renderAttackIndicator = false;
 
-	@Inject(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;push()V"))
-	private void renderAttackIndicatorForDebugScreen(MatrixStack stack, CallbackInfo _info) {
+	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderCrosshair(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
+	private void renderAttackIndicatorForDebugScreen2(MatrixStack stack, float _tickDelta, CallbackInfo _info) {
 		if (MinecraftClient.getInstance().options.attackIndicator == AttackIndicator.CROSSHAIR) {
 			renderAttackIndicator = true;
 			renderCrosshair(stack);
