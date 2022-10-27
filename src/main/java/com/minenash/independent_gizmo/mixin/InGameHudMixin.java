@@ -24,7 +24,7 @@ public abstract class InGameHudMixin {
 
 	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderCrosshair(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
 	private void renderAttackIndicatorForDebugScreen2(MatrixStack stack, float _tickDelta, CallbackInfo _info) {
-		if (MinecraftClient.getInstance().options.attackIndicator == AttackIndicator.CROSSHAIR) {
+		if (MinecraftClient.getInstance().options.getAttackIndicator().getValue() == AttackIndicator.CROSSHAIR) {
 			renderAttackIndicator = true;
 			renderCrosshair(stack);
 			renderAttackIndicator = false;
