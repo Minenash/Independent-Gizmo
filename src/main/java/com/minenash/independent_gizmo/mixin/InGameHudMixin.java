@@ -1,8 +1,8 @@
 package com.minenash.independent_gizmo.mixin;
 
 import com.minenash.independent_gizmo.IndependentGizmo;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.option.AttackIndicator;
 import net.minecraft.client.option.GameOptions;
@@ -24,7 +24,7 @@ public abstract class InGameHudMixin {
 
 	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderCrosshair(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
 	private void renderAttackIndicatorForDebugScreen2(MatrixStack stack, float _tickDelta, CallbackInfo _info) {
-		if (MinecraftClient.getInstance().options.attackIndicator == AttackIndicator.CROSSHAIR) {
+		if (MinecraftClient.getInstance().options.getAttackIndicator().getValue() == AttackIndicator.CROSSHAIR) {
 			renderAttackIndicator = true;
 			renderCrosshair(stack);
 			renderAttackIndicator = false;
@@ -37,9 +37,9 @@ public abstract class InGameHudMixin {
 	}
 
 	@Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", ordinal = 0,target = "Lnet/minecraft/client/gui/hud/InGameHud;drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V"))
-	private void skipNormalCrosshairRendering(InGameHud hud, MatrixStack stack, int x, int y, int u, int v, int width, int height) {
+	private void skipNormalCrosshairRendering(MatrixStack stack, int x, int y, int u, int v, int width, int height) {
 		if (!renderAttackIndicator)
-			hud.drawTexture(stack, x, y, u, v, width, height);
+			DrawableHelper.drawTexture(stack, x, y, u, v, width, height);
 	}
 
 }
