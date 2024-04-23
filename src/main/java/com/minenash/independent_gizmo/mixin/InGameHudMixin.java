@@ -9,6 +9,7 @@ import net.minecraft.client.option.AttackIndicator;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -17,15 +18,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = InGameHud.class, priority = 1200)
 public abstract class InGameHudMixin {
 
-	@Shadow protected abstract void renderCrosshair(DrawContext context);
+	@Shadow protected abstract void renderCrosshair(DrawContext context, float tickDelta);
 
-	boolean renderAttackIndicator = false;
+	@Unique boolean renderAttackIndicator = false;
 
-	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderCrosshair(Lnet/minecraft/client/gui/DrawContext;)V", shift = At.Shift.AFTER))
-	private void renderAttackIndicatorForDebugScreen2(DrawContext context, float _tickDelta, CallbackInfo _info) {
-		if (MinecraftClient.getInstance().options.getAttackIndicator().getValue() == AttackIndicator.CROSSHAIR) {
+	@Inject(method = "renderCrosshair", at = @At(value = "HEAD"))
+	private void renderAttackIndicatorForDebugScreen2(DrawContext context, float tickDelta, CallbackInfo _info) {
+		if (MinecraftClient.getInstance().options.getAttackIndicator().getValue() == AttackIndicator.CROSSHAIR && !renderAttackIndicator) {
 			renderAttackIndicator = true;
-			renderCrosshair(context);
+			renderCrosshair(context, tickDelta);
 			renderAttackIndicator = false;
 		}
 	}
