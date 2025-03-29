@@ -6,6 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.option.AttackIndicator;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,6 +16,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.function.Function;
 
 @Mixin(value = InGameHud.class, priority = 1200)
 public abstract class InGameHudMixin {
@@ -37,10 +40,10 @@ public abstract class InGameHudMixin {
 		return !renderAttackIndicator && IndependentGizmo.debugCrosshairEnable;
 	}
 
-	@Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V"))
-	private void skipNormalCrosshairRendering(DrawContext context, Identifier texture, int x, int y, int width, int height) {
+	@Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIII)V"))
+	private void skipNormalCrosshairRendering(DrawContext context, Function<Identifier, RenderLayer> renderLayers, Identifier texture, int x, int y, int width, int height) {
 		if (!renderAttackIndicator)
-			context.drawGuiTexture(texture, x, y, width, height);
+			context.drawGuiTexture(renderLayers, texture, x, y, width, height);
 	}
 
 }
