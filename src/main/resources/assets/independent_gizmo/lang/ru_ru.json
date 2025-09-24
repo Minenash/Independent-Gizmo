@@ -1,3 +1,6 @@
 {
-  "key.independent.gizmo.gizmo_crosshair_toggle": "Переключить видимость осей координат"
+  "key.independent.gizmo.gizmo_crosshair_toggle": "Переключить видимость осей координат",
+  "key.independent.gizmo.gizmo_size_up": "Расширять",
+  "key.independent.gizmo.gizmo_size_down": "Сжиматься",
+  "key.categories.independent_gizmo": "видимость осей координат"
 }

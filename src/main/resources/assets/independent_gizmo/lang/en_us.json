@@ -1,3 +1,6 @@
 {
-  "key.independent.gizmo.gizmo_crosshair_toggle": "Toggle Gizmo Crosshair"
+  "key.independent.gizmo.gizmo_crosshair_toggle": "Toggle Gizmo Crosshair",
+  "key.independent.gizmo.gizmo_size_up": "Expand Gizmo",
+  "key.independent.gizmo.gizmo_size_down": "Shrink Gizmo",
+  "key.categories.independent_gizmo": "Independent Gizmo"
 }
