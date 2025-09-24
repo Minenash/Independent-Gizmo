@@ -1,12 +1,11 @@
 package com.minenash.independent_gizmo.mixin;
 
 import com.minenash.independent_gizmo.IndependentGizmo;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.option.AttackIndicator;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,8 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.function.Function;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = InGameHud.class, priority = 1200)
 public abstract class InGameHudMixin {
@@ -35,15 +33,16 @@ public abstract class InGameHudMixin {
 		}
 	}
 
-	@Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowDebugHud()Z"))
-	private boolean getDebugCrosshairEnable(DebugHud instance) {
-		return !renderAttackIndicator && IndependentGizmo.debugCrosshairEnable;
+	@Inject(method = "shouldRenderCrosshair", at = @At(value ="RETURN"),cancellable = true)
+	public void getDebugCrosshairEnable(CallbackInfoReturnable<Boolean> cir) {
+		cir.setReturnValue(!renderAttackIndicator && IndependentGizmo.debugCrosshairEnable);
 	}
 
-	@Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIII)V"))
-	private void skipNormalCrosshairRendering(DrawContext context, Function<Identifier, RenderLayer> renderLayers, Identifier texture, int x, int y, int width, int height) {
+
+	@Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIII)V"))
+	private void skipNormalCrosshairRendering(DrawContext instance, RenderPipeline pipeline, Identifier sprite, int x, int y, int width, int height) {
 		if (!renderAttackIndicator)
-			context.drawGuiTexture(renderLayers, texture, x, y, width, height);
+			instance.drawGuiTexture(pipeline,sprite, x, y, width, height);
 	}
 
 }
