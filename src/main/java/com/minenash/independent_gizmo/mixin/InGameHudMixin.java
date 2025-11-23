@@ -1,49 +1,29 @@
 package com.minenash.independent_gizmo.mixin;
 
-import com.minenash.independent_gizmo.IndependentGizmo;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.option.AttackIndicator;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.gui.hud.debug.DebugHudEntries;
+import net.minecraft.client.gui.hud.debug.DebugHudProfile;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.function.Function;
 
 @Mixin(value = InGameHud.class, priority = 1200)
 public abstract class InGameHudMixin {
 
-	@Shadow protected abstract void renderCrosshair(DrawContext context, RenderTickCounter tickCounter);
+	@Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/debug/DebugHudProfile;isEntryVisible(Lnet/minecraft/util/Identifier;)Z"))
+	private boolean shouldRenderCrosshair(DebugHudProfile instance, Identifier entryId) {
+		return false;
+	}
 
-	@Unique boolean renderAttackIndicator = false;
-
-	@Inject(method = "renderCrosshair", at = @At(value = "HEAD"))
-	private void renderAttackIndicatorForDebugScreen2(DrawContext context, RenderTickCounter tickCounter, CallbackInfo _info) {
-		if (MinecraftClient.getInstance().options.getAttackIndicator().getValue() == AttackIndicator.CROSSHAIR && !renderAttackIndicator) {
-			renderAttackIndicator = true;
-			renderCrosshair(context, tickCounter);
-			renderAttackIndicator = false;
+	@Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIII)V"))
+	private void drawNormalCrosshair(DrawContext instance, RenderPipeline pipeline, Identifier sprite, int x, int y, int width, int height) {
+		if (!MinecraftClient.getInstance().debugHudEntryList.isEntryVisible(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR)) {
+			instance.drawGuiTexture(RenderPipelines.CROSSHAIR, sprite,x,y,width,height);
 		}
 	}
-
-	@Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowDebugHud()Z"))
-	private boolean getDebugCrosshairEnable(DebugHud instance) {
-		return !renderAttackIndicator && IndependentGizmo.debugCrosshairEnable;
-	}
-
-	@Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIII)V"))
-	private void skipNormalCrosshairRendering(DrawContext context, Function<Identifier, RenderLayer> renderLayers, Identifier texture, int x, int y, int width, int height) {
-		if (!renderAttackIndicator)
-			context.drawGuiTexture(renderLayers, texture, x, y, width, height);
-	}
-
 }
